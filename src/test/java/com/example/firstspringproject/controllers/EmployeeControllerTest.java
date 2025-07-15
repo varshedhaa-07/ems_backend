@@ -1,6 +1,7 @@
 package com.example.firstspringproject.controllers;
 
 import com.example.firstspringproject.models.RegisterDetails;
+import com.example.firstspringproject.models.UserDetailsDto;
 import com.example.firstspringproject.services.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,4 +41,62 @@ class EmployeeControllerTest {
         List<RegisterDetails> result = employeeController.getMethod();
         assertEquals(2,result.size());
     }
+
+    @Test
+    void testGetEmployeeById() {
+        RegisterDetails emp = new RegisterDetails();
+        emp.setEmpId(1);
+        emp.setName("Test Employee");
+
+        when(employeeService.getEmployeeById(1)).thenReturn(emp);
+        RegisterDetails result = employeeController.getEmployeeById(1);
+
+        assertNotNull(result);
+        assertEquals("Test Employee", result.getName());
+    }
+
+    @Test
+    void testGetEmployeeByRole() {
+        RegisterDetails emp = new RegisterDetails();
+        emp.setEmpId(1);
+        emp.setName("Admin");
+
+        when(employeeService.getEmployeeByRole("ADMIN")).thenReturn(emp);
+        RegisterDetails result = employeeController.getEmployeeByRole("ADMIN");
+
+        assertNotNull(result);
+        assertEquals("Admin", result.getName());
+    }
+
+    @Test
+    void testPostMethod() {
+        UserDetailsDto dto = new UserDetailsDto();
+        dto.setEmpId(1);
+        dto.setName("John");
+
+        when(employeeService.addEmployee(dto)).thenReturn("Employee Added Successfully");
+        String result = employeeController.postMethod(dto);
+
+        assertEquals("Employee Added Successfully", result);
+    }
+
+    @Test
+    void testPutMethod() {
+        UserDetailsDto dto = new UserDetailsDto();
+        dto.setName("Updated Name");
+
+        when(employeeService.updateEmployee(1, dto)).thenReturn("Employee updated successfully");
+        String result = employeeController.putMethod(1, dto);
+
+        assertEquals("Employee updated successfully", result);
+    }
+
+    @Test
+    void testDeleteMethod() {
+        when(employeeService.deleteEmployee(1)).thenReturn("Employee deleted successfully");
+        String result = employeeController.deleteMethod(1);
+
+        assertEquals("Employee deleted successfully", result);
+    }
+
 }

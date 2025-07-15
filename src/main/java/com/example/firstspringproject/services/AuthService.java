@@ -1,6 +1,7 @@
 package com.example.firstspringproject.services;
 
 import com.example.firstspringproject.jwt.JwtTokenProvider;
+import com.example.firstspringproject.models.AuthResponse;
 import com.example.firstspringproject.models.RegisterDetails;
 import com.example.firstspringproject.models.Roles;
 import com.example.firstspringproject.models.UserDetailsDto;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
@@ -67,15 +69,20 @@ public class AuthService {
 //            return "Login not successful";
 //    }
 
-    public String authenticate(RegisterDetails login){
-        Authentication authentication =
-                authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                login.getUserName(),login.getPassword()));
-        return  jwtTokenProvider.generateToken(authentication);
+    public AuthResponse authenticate(RegisterDetails login) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        login.getUserName(), login.getPassword()));
+
+        String token = jwtTokenProvider.generateToken(authentication);
+        RegisterDetails user = registerRepository.findByUserName(login.getUserName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Set<String> roleNames = user.getRoles()
+                .stream()
+                .map(role -> role.getRoleName())
+                .collect(Collectors.toSet());
+
+        return new AuthResponse(token, user.getUserName(), roleNames);
     }
 
-    public Optional<RegisterDetails> getUserByUsername(String username){
-        return registerRepository.findByUserName(username);
-    }
 }
