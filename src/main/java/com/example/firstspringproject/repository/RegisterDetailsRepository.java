@@ -19,4 +19,7 @@ public interface RegisterDetailsRepository extends JpaRepository<RegisterDetails
     @Query("SELECT r FROM RegisterDetails r JOIN r.roles role WHERE role.roleName = :roleName")
     Optional<RegisterDetails> findByRole(@Param("roleName") String roleName);
 
+    boolean existsByUserName(String userName);
+
+    boolean existsByEmail(String email);
 }

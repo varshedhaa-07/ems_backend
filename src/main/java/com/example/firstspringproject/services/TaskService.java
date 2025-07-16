@@ -7,6 +7,8 @@ import com.example.firstspringproject.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TaskService {
 
@@ -24,4 +26,9 @@ public class TaskService {
         taskRepository.save(task);
         return "Task assigned to employee ID: " + empId;
     }
+
+    public List<Task> getTasksByEmployeeId(int empId) {
+        return taskRepository.findByAssignedEmployee_EmpId(empId);
+    }
+
 }

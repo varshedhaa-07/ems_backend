@@ -5,12 +5,14 @@ import com.example.firstspringproject.models.Roles;
 import com.example.firstspringproject.models.UserDetailsDto;
 import com.example.firstspringproject.repository.RegisterDetailsRepository;
 import com.example.firstspringproject.repository.RolesRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -24,6 +26,9 @@ public class EmployeeService {
 
     @Autowired
     RolesRepository rolesRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     public List<RegisterDetails> getMethod() {
         return registerDetailsRepository.findAll();
@@ -56,19 +61,41 @@ public class EmployeeService {
         return "Employee Added Successfully";
     }
 
-    public String updateEmployee(int empId, UserDetailsDto details) {
-        RegisterDetails user=registerDetailsRepository.findById(empId)
-                .orElseThrow(()->new RuntimeException("No such user present"));
-        user.setName(details.getName());
-        user.setEmail(details.getEmail());
-        user.setPassword(details.getPassword());
-        user.setUserName(details.getUserName());
-        registerDetailsRepository.save(user);
+    public String updateEmployee(int empId, UserDetailsDto dto) {
+        RegisterDetails updatedEmp = modelMapper.map(dto, RegisterDetails.class);
+
+        RegisterDetails existingEmp = registerDetailsRepository.findById(empId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        if (updatedEmp.getName() != null) existingEmp.setName(updatedEmp.getName());
+        if (updatedEmp.getEmail() != null) existingEmp.setEmail(updatedEmp.getEmail());
+        if (updatedEmp.getUserName() != null) existingEmp.setUserName(updatedEmp.getUserName());
+        if (updatedEmp.getPassword() != null) existingEmp.setPassword(passwordEncoder.encode(updatedEmp.getPassword()));
+
+        registerDetailsRepository.save(existingEmp);
         return "Employee updated successfully";
     }
 
+
+
+
     public String deleteEmployee(int empId) {
+        Optional<RegisterDetails> optionalUser = registerDetailsRepository.findById(empId);
+
+        if (optionalUser.isEmpty()) {
+            return "Employee not found";
+        }
+
+        RegisterDetails user = optionalUser.get();
+
+        // Step 1: Clear roles (removes associations from join table)
+        user.getRoles().clear();
+        registerDetailsRepository.save(user);  // Persist the cleared roles
+
+        // Step 2: Now safely delete the user
         registerDetailsRepository.deleteById(empId);
+
         return "Employee deleted successfully";
     }
+
 }

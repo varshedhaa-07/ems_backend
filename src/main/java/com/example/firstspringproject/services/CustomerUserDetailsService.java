@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class CustomerUserDetailsService implements UserDetailsService {
+public class  CustomerUserDetailsService implements UserDetailsService {
 
     @Autowired
     RegisterDetailsRepository registerDetailsRepository;

@@ -1,10 +1,7 @@
 package com.example.firstspringproject.services;
 
 import com.example.firstspringproject.jwt.JwtTokenProvider;
-import com.example.firstspringproject.models.AuthResponse;
-import com.example.firstspringproject.models.RegisterDetails;
-import com.example.firstspringproject.models.Roles;
-import com.example.firstspringproject.models.UserDetailsDto;
+import com.example.firstspringproject.models.*;
 import com.example.firstspringproject.repository.RegisterDetailsRepository;
 import com.example.firstspringproject.repository.RegisterRepository;
 import com.example.firstspringproject.repository.RolesRepository;
@@ -69,7 +66,7 @@ public class AuthService {
 //            return "Login not successful";
 //    }
 
-    public AuthResponse authenticate(RegisterDetails login) {
+    public JwtResponse authenticate(RegisterDetails login) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         login.getUserName(), login.getPassword()));
@@ -82,7 +79,7 @@ public class AuthService {
                 .map(role -> role.getRoleName())
                 .collect(Collectors.toSet());
 
-        return new AuthResponse(token, user.getUserName(), roleNames);
+        return new JwtResponse(token, user.getUserName(), roleNames);
     }
 
 }
