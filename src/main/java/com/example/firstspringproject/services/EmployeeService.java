@@ -5,6 +5,7 @@ import com.example.firstspringproject.models.Roles;
 import com.example.firstspringproject.models.UserDetailsDto;
 import com.example.firstspringproject.repository.RegisterDetailsRepository;
 import com.example.firstspringproject.repository.RolesRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,8 +40,15 @@ public class EmployeeService {
     }
 
     public RegisterDetails getEmployeeByRole(String role) {
-        return registerDetailsRepository.findByRole(role).orElse(new RegisterDetails());
+        return registerDetailsRepository.findByRole(role)
+                .orElseThrow(() -> new EntityNotFoundException("User " + role + " not found"));
     }
+
+    public RegisterDetails getEmployeeByName(String name) {
+        return registerDetailsRepository.findByName(name)
+                .orElseThrow(() -> new EntityNotFoundException("User " + name + " not found"));
+    }
+
 
     public String addEmployee(UserDetailsDto register) {
         RegisterDetails registerDetails = new RegisterDetails();
@@ -52,7 +60,7 @@ public class EmployeeService {
         Set<Roles> roles = new HashSet<>();
         for(String roleName: register.getRoleNames()){
             Roles role = rolesRepository.findByRoleName(roleName)
-                    .orElseThrow(()->new RuntimeException("User not found" + roleName));
+                    .orElseThrow(()->new RuntimeException("Role not found " + roleName));
             roles.add(role);
         }
         registerDetails.setRoles(roles);

@@ -16,6 +16,8 @@ public class Task {
 
     private String title;
 
+    private String status = "Yet to start";
+
     @ManyToOne
     @JoinColumn(name = "emp_id")
     private RegisterDetails assignedEmployee;
@@ -34,6 +36,14 @@ public class Task {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public RegisterDetails getAssignedEmployee() {

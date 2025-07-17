@@ -4,6 +4,7 @@ import com.example.firstspringproject.models.RegisterDetails;
 import com.example.firstspringproject.models.UserDetailsDto;
 import com.example.firstspringproject.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +39,16 @@ public class EmployeeController {
     @GetMapping("/employee/role/{role}")
     public RegisterDetails getEmployeeByRole(@PathVariable String role){
         return employeeService.getEmployeeByRole(role);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @GetMapping("/employee/{name}")
+    public ResponseEntity<RegisterDetails> getEmployeeByName(@PathVariable("name") String name) {
+        RegisterDetails employee = employeeService.getEmployeeByName(name);
+        if (employee == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(employee);
     }
 
 

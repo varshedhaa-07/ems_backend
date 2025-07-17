@@ -14,7 +14,9 @@ import java.util.Optional;
 public interface RegisterDetailsRepository extends JpaRepository<RegisterDetails,Integer> {
     RegisterDetails findByEmail(String email);
 
-    Optional<RegisterDetails> findByUserName(String username);
+    Optional<RegisterDetails> findByName(String name);
+
+    Optional<RegisterDetails> findByUserName(String userName);
 
     @Query("SELECT r FROM RegisterDetails r JOIN r.roles role WHERE role.roleName = :roleName")
     Optional<RegisterDetails> findByRole(@Param("roleName") String roleName);
